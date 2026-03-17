@@ -1,0 +1,119 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "t:sections.header.name",
+  "type": "header",
+  "sections": {
+    "announcement-bar": {
+      "type": "announcement-bar",
+      "blocks": {
+        "announcement_Vidx6T": {
+          "type": "announcement",
+          "settings": {
+            "text": "Welcome to our store 1",
+            "link": ""
+          }
+        },
+        "announcement_heQHBH": {
+          "type": "announcement",
+          "settings": {
+            "text": "Welcome to our store 2",
+            "link": ""
+          }
+        },
+        "announcement-bar-0": {
+          "type": "announcement",
+          "settings": {
+            "text": "Welcome to our store 3",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "announcement_Vidx6T",
+        "announcement_heQHBH",
+        "announcement-bar-0"
+      ],
+      "disabled": true,
+      "settings": {
+        "auto_rotate": true,
+        "change_slides_speed": 3,
+        "color_scheme": "scheme-2",
+        "show_line_separator": false,
+        "show_social": false,
+        "enable_country_selector": false,
+        "enable_language_selector": false
+      }
+    },
+    "custom_accbar_UKLfLk": {
+      "type": "custom-accbar",
+      "blocks": {
+        "slide_XEF37R": {
+          "type": "slide",
+          "settings": {
+            "slide_text": "Slide 1",
+            "bg_color": "#ff595e",
+            "text_color": "#000000",
+            "arrow_color": "#000000"
+          }
+        },
+        "slide_GWGU3i": {
+          "type": "slide",
+          "settings": {
+            "slide_text": "Slide 2",
+            "bg_color": "#121212",
+            "text_color": "#ffffff",
+            "arrow_color": "#ffffff"
+          }
+        },
+        "slide_gzJnWP": {
+          "type": "slide",
+          "settings": {
+            "slide_text": "Slide 3",
+            "bg_color": "#59ffe1",
+            "text_color": "#f21e1e",
+            "arrow_color": "#f21e1e"
+          }
+        }
+      },
+      "block_order": [
+        "slide_XEF37R",
+        "slide_GWGU3i",
+        "slide_gzJnWP"
+      ],
+      "name": "announcement Swiper ",
+      "settings": {}
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "logo_position": "middle-center",
+        "mobile_logo_position": "center",
+        "menu": "main-menu",
+        "menu_type_desktop": "mega",
+        "sticky_header_type": "on-scroll-up",
+        "show_line_separator": true,
+        "color_scheme": "scheme-1",
+        "menu_color_scheme": "scheme-1",
+        "enable_country_selector": true,
+        "enable_language_selector": true,
+        "enable_customer_avatar": true,
+        "margin_bottom": 0,
+        "padding_top": 20,
+        "padding_bottom": 20
+      }
+    }
+  },
+  "order": [
+    "announcement-bar",
+    "custom_accbar_UKLfLk",
+    "header"
+  ]
+}

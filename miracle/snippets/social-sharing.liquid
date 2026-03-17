@@ -1,0 +1,72 @@
+<div class="drs-social-sharing">
+{% comment %}
+
+  This snippet is used to showcase each collection during the loop,
+  'for product in collection.products' in list-collections.liquid.
+
+{% endcomment %}
+{% assign shareCountClass = '' %}
+
+{% if template contains 'product' %}
+  {% capture permalinkURL %}{{ shop.url }}{{ product.url }}{% endcapture %}
+
+  {% unless settings.social_sharing_count %}
+    {% assign shareCountClass = 'no-count' %}
+  {% endunless %}
+
+{% endif %}
+
+<div class="social-sharing {{ shareCountClass }}" data-permalink="{{ permalinkURL }}">
+
+
+
+    <a target="_blank" href="//www.facebook.com/sharer.php?u={{ permalinkURL }}" class="share-facebook">
+      <span class="icon icon-facebook"><i class="fa fa-facebook-square" aria-hidden="true"></i></span>
+      <!-- <span class="share-count">0</span> -->
+    </a>
+
+
+
+    <a target="_blank" href="mailto:?subject=I wanted you to see this site&amp;body=Check out this site http://{ permalinkURL }}" class="share-instagram">
+      <span class="icon icon-twitter"><i class="fa fa-instagram" aria-hidden="true"></i></span>
+      <!-- <span class="share-count">0</span> -->
+    </a>
+
+
+    <a target="_blank" href="//twitter.com/share?url={{ permalinkURL }}" class="share-twitter">
+      <span class="icon icon-twitter">
+         <svg viewBox="0 0 24 24" aria-label="X" role="img"><g><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></g></svg>
+      </span>
+      <!-- <span class="share-count">0</span> -->
+    </a>
+
+
+
+    <a target="_blank" href="https://wa.me/?text=This%20awesome%20product%3A%20{{ permalinkURL }}" class="share_whatsapp">
+      <span class="icon icon-twitter"><i class="fa fa-whatsapp" aria-hidden="true"></i></span>
+      <!-- <span class="share-count">0</span> -->
+    </a>
+
+ 
+    <a target="_blank" href="//www.linkedin.com/cws/share?url={{ permalinkURL }}" class="share-linkedin">
+      <span class="icon icon-twitter"><i class="fa fa-linkedin-square" aria-hidden="true"></i></span>
+      <!-- <span class="share-count">0</span> -->
+    </a>
+
+
+</div>
+</div>
+<style>
+.drs-social-sharing {
+    opacity: 0;
+    position: absolute;
+    left: 0;
+    z-index: 9999;
+    top: 35px;
+    background: #fff;
+}
+  .social-sharing.no-count {
+    display: flex;
+    flex-direction: column;
+}
+</style>
