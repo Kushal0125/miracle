@@ -1,0 +1,160 @@
+<section class="swiper-section">
+  <div class="swiper mySwiper">
+    <div class="swiper-wrapper">
+      {% for block in section.blocks %}
+        <div class="swiper-slide"  style="background-color: {{ block.settings.bg_color }}; color: {{ block.settings.text_color }};" 
+          data-arrowcolor="{{ block.settings.arrow_color }}" >
+         <div class="swp-cuson-container">
+             <p>{{ block.settings.slide_text }}
+                <a href="#"  style="color: {{ block.settings.text_color }};">Find your perfcet polo</a>
+             </p>
+        <span class="swiper-close-btn">close</span>
+         </div>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+  </div>
+</section>
+ 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css" />
+
+<style>
+  .swiper {
+    width: 100%;
+    height: 50px;
+  }
+ .swp-cuson-container{
+    width: 94%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    font-size:1.5rem;
+}
+  .swiper-slide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+ .swiper-close-btn{
+  cursor:pointer;
+}
+  .swiper-button-next,
+  .swiper-button-prev {
+    transition: color 0.3s ease;
+    width:0.8rem;
+  }
+ 
+  @media screen and (max-width: 768px) {
+  .swp-cuson-container {
+    width: 85%;
+  }
+  .swiper-button-next,
+  .swiper-button-prev {
+    width: 0.5rem;
+  }
+}
+
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
+  <script>
+document.addEventListener('DOMContentLoaded', function() {
+  const sliderSection = document.querySelector('.swiper-section');
+  function isSliderClosed() {
+    return localStorage.getItem('swiperClosed') === 'true';
+  }
+  function closeSlider() {
+    sliderSection.classList.add('hidden');
+    localStorage.setItem('swiperClosed', 'true');
+  }
+
+  if (isSliderClosed()) {
+    sliderSection.classList.add('hidden');
+    return; 
+  }
+
+  var swiper = new Swiper(".mySwiper", {
+    loop: true,
+    autoplay: {
+      delay: 3000,            
+      disableOnInteraction: false,
+    },
+    navigation: {
+      nextEl: ".swiper-button-next",
+      prevEl: ".swiper-button-prev",
+    },
+    on: {
+      init: function() {
+        updateArrowColor(this);
+      },
+      slideChange: function() {
+        updateArrowColor(this);
+      },
+    },
+  });
+
+  function updateArrowColor(swiper) {
+    const activeSlide = swiper.slides[swiper.activeIndex];
+    const arrowColor = activeSlide.dataset.arrowcolor || '#000';
+    document.querySelector('.swiper-button-next').style.color = arrowColor;
+    document.querySelector('.swiper-button-prev').style.color = arrowColor;
+  }
+
+
+  document.querySelectorAll('.swiper-close-btn').forEach(function(btn) {
+    btn.addEventListener('click', closeSlider);
+  });
+ 
+});
+</script>
+
+
+{% schema %}
+{
+  "name": "Swiper Slider",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "text",
+          "id": "slide_text",
+          "label": "Slide Text",
+          "default": "Slide 1"
+        },
+        {
+          "type": "color",
+          "id": "bg_color",
+          "label": "Background Color",
+          "default": "#ff595e"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text Color",
+          "default": "#000000"
+        },
+        {
+          "type": "color",
+          "id": "arrow_color",
+          "label": "Arrow Color",
+          "default": "#000000"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 10,
+  "presets": [
+    {
+      "name": "announcement Swiper ",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

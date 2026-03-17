@@ -1,0 +1,214 @@
+{% comment %}
+  Renders a product media modal. Also see 'product-media-gallery'
+
+  Accepts:
+  - product: {Object} Product liquid object
+  - variant_images: {Array} Product images associated with a variant
+
+  Usage:
+  {% render 'product-media-modal' %}
+{% endcomment %}
+   <!-- Slick CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick-theme.css"/>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Slick JS (IMPORTANT: JS before init) -->
+  <script src="https://cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick.min.js"></script>
+
+   <style>
+/* FULL SECTION WRAPPER */
+.product-gallery {
+  width: 100%;
+  padding: 40px 0;
+}
+
+/* ============================= */
+/* MAIN IMAGE CENTER DESIGN */
+/* ============================= */
+
+.slider-for {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-block:0;
+  border-bottom:1px solid;
+}
+
+.slider-for .slick-slide {
+  display: flex !important;
+  justify-content: center;
+}
+
+.slider-for img {
+  width: 420px;
+  max-width: 90%;
+  max-height: 545px;
+  border-radius: 14px;
+  object-fit: scale-down;
+  transform-origin: center center;
+  transition: transform 0.4s ease-in-out; /* smooth zoom */
+}
+
+.slider-for img.zoomed {
+  transform: scale(2.15);
+  cursor: zoom-out;
+}
+
+/* ============================= */
+/* THUMBNAILS FULL WIDTH */
+/* ============================= */
+
+.slider-nav {
+    width: 40%;
+    margin: auto;
+    margin-top:1rem;
+}
+/* slick internal fix */
+.slider-nav .slick-track {
+  display: flex !important;
+  justify-content: center;   /* 👈 center thumbnails */
+}
+
+.slider-nav .slick-slide {
+  width: auto !important;
+  margin: 0 10px;
+}
+
+/* THUMB ICON IMAGE */
+.slider-nav img {
+  width: 72px;              /* 👈 same small size */
+  height: 72px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: all 0.25s ease;
+  border: 2px solid transparent;
+}
+
+/* ACTIVE THUMB */
+.slider-nav .slick-current img {
+  opacity: 1;
+  border-color: #000;
+}
+
+.slick-next:before{
+color:black;
+font-size:50px;
+}
+
+.slick-prev:before {
+color:black;
+font-size:50px;
+}
+.slick-prev, .slick-next {
+  top:unset !important;
+bottom:350px;
+}
+.slick-prev {
+left:10px;
+}
+.slick-next{
+right:30px;
+}
+/* ============================= */
+/* MOBILE RESPONSIVE */
+/* ============================= */
+
+@media (max-width: 768px) {
+  .slider-for img {
+    width: 300px;
+  }
+
+  .slider-nav img {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+
+ </style>
+<product-modal id="ProductModal-{{ section.id }}" class="product-media-modal media-modal">
+  {% comment %} <div
+    class="product-media-modal__dialog color-{{ section.settings.color_scheme }} gradient"
+    role="dialog"
+    aria-label="{{ 'products.modal.label' | t }}"
+    aria-modal="true"
+    tabindex="-1"
+  > {% endcomment %}
+    <button
+      id="ModalClose-{{ section.id }}"
+      type="button"
+      class="product-media-modal__toggle"
+      aria-label="{{ 'accessibility.close' | t }}"
+    >
+      {{ 'icon-close.svg' | inline_asset_content }}
+    </button> 
+    
+     {% comment %} <div
+      class="product-media-modal__content  color-{{ section.settings.color_scheme }} gradient slider-for"
+      role="document"
+      aria-label="{{ 'products.modal.label' | t }}"
+      tabindex="0"
+    >
+      {%- liquid
+        if product.selected_or_first_available_variant.featured_media != null
+          assign media = product.selected_or_first_available_variant.featured_media
+          render 'product-media', media: media, loop: section.settings.enable_video_looping, variant_image: section.settings.hide_variants
+        endif
+      -%} {% endcomment %}
+<div class="slider-for">
+      {%- for image in product.images -%}
+   <div><img src="{{ image.src | product_img_url: '' }}" width="100%" ></div>
+        {% comment %} {%- liquid
+          if section.settings.hide_variants and variant_images contains media.src or variant_images contains media.id
+            assign variant_image = true
+          else
+            assign variant_image = false
+          endif
+
+          unless media.id == product.selected_or_first_available_variant.featured_media.id
+            render 'product-media', media: media, loop: section.settings.enable_video_looping, variant_image: variant_image
+          endunless
+        -%} {% endcomment %}
+      {%- endfor -%}
+    </div>
+    <div class="slider-nav">
+      {%- for image in product.images -%}
+  <div><img src="{{ image.src | product_img_url: '' }}" width="100%" height="auto"></div>
+   {% comment %} </div> {% endcomment %}
+      {%- endfor -%}
+    </div>
+  {% comment %} </div> {% endcomment %}
+</product-modal>
+
+<script>
+  $(document).ready(function () {
+
+    $('.slider-for').slick({
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      arrows: true,
+      fade: true,
+      infinite:false,
+      asNavFor: '.slider-nav',
+    });
+
+    $('.slider-nav').slick({
+      slidesToShow: 4,
+      slidesToScroll: none,
+      asNavFor: '.slider-for',
+      infinite: false,
+      focusOnSelect: true,
+      {% comment %} prevArrow:"<button type='button' class='slick-prev pull-left'><i class='fa fa-angle-left' aria-hidden='true'></i></button>",
+      nextArrow:"<button type='button' class='slick-next pull-right'><i class='fa fa-angle-right' aria-hidden='true'></i></button>" {% endcomment %}
+
+    });
+    $('.slider-for img').on('click', function () {
+  $(this).toggleClass('zoomed');
+});
+  });
+</script>
