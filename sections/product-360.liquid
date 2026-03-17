@@ -1,0 +1,73 @@
+<div id="product-360-container">
+  <img id="product-360-image" src="{{ 'product-1.jpg' | asset_url }}" alt="360 view of the product" />
+</div>
+
+<button id="prev-button" class="360-nav-button">Previous</button>
+<button id="next-button" class="360-nav-button">Next</button>
+
+
+<Style>
+    #product-360-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  max-width: 100%;
+  margin: 20px auto;
+}
+
+#product-360-image {
+  max-width: 100%;
+  transition: all 0.2s ease;
+}
+
+.360-nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+#prev-button {
+  left: 10px;
+}
+
+#next-button {
+  right: 10px;
+}
+
+.360-nav-button:hover {
+  background-color: #444;
+}
+
+</Style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+  var currentIndex = 1; // Starting image index
+  var totalImages = 24; // Total number of images (adjust according to your images)
+  var productImage = document.getElementById('product-360-image');
+
+  // Function to update the image based on the index
+  function updateProductImage(index) {
+    productImage.src = `{{ 'product-' }}${index}.jpg`; // Dynamically change the image
+  }
+
+  // Event listeners for the buttons
+  document.getElementById('prev-button').addEventListener('click', function() {
+    currentIndex = currentIndex <= 1 ? totalImages : currentIndex - 1;
+    updateProductImage(currentIndex);
+  });
+
+  document.getElementById('next-button').addEventListener('click', function() {
+    currentIndex = currentIndex >= totalImages ? 1 : currentIndex + 1;
+    updateProductImage(currentIndex);
+  });
+});
+
+</script>
