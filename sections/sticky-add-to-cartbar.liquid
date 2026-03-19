@@ -142,40 +142,98 @@
 </style>
 
     <script>
-        window.addEventListener('DOMContentLoaded', (event) => {
-            const stickyATC = document.querySelector('#md-sticky-atc')
-            const img = stickyATC.querySelector('.product-content img')
-            const btn = stickyATC.querySelector('[name="add"]')
-            const btnSpinner = btn.querySelector('.loading__spinner')
-            const selectField = stickyATC.querySelector('select[name="id"]')
-            const threshold = document.querySelector('button[name="add"]').getBoundingClientRect().bottom + Number(stickyATC.dataset.offset)
+        window.addEventListener('DOMContentLoaded', () => {
+            const stickyATC = document.querySelector('#md-sticky-atc');
 
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > threshold) {
-                    stickyATC.classList.add('show')
-                    document.documentElement.style.paddingBottom = `${stickyATC.clientHeight}px`
-                    document.documentElement.style.height = 'auto'
+            if (!stickyATC) return;
+
+            const mainProduct = document.querySelector('product-info[id^="MainProduct-"]');
+            const mainForm = mainProduct?.querySelector('form[data-type="add-to-cart-form"]');
+            const mainVariantInput = mainForm?.querySelector('input[name="id"]');
+            const mainQuantityInput = mainProduct?.querySelector('.product-form__quantity .quantity__input');
+            const img = stickyATC.querySelector('.product-content img');
+            const btn = stickyATC.querySelector('button[name="add"]');
+            const btnLabel = btn?.querySelector('span');
+            const selectField = stickyATC.querySelector('select[name="id"]');
+            const stickyQuantityInput = stickyATC.querySelector('.quantity__input');
+            const offset = Number(stickyATC.dataset.offset || 0);
+
+            if (!mainProduct || !mainForm || !btn) return;
+
+            const getTriggerElement = () => {
+                const selectSizeButton = mainProduct.querySelector('#cusotm-select-size-btn:not(.hidden)');
+
+                return selectSizeButton || mainProduct.querySelector('.product-form__buttons') || mainForm;
+            };
+
+            const syncStickyVariantState = () => {
+                if (!selectField) return;
+
+                const selectedOption = selectField.options[selectField.selectedIndex];
+                const isAvailable = selectedOption?.dataset.available === 'true';
+
+                if (img && selectedOption?.dataset.img) {
+                    img.setAttribute('src', selectedOption.dataset.img);
+                }
+
+                btn.toggleAttribute('disabled', !isAvailable);
+
+                if (btnLabel) {
+                    btnLabel.textContent = isAvailable ? window.variantStrings.addToCart : window.variantStrings.soldOut;
+                }
+            };
+
+            const syncStickyVariantFromMainForm = () => {
+                if (!selectField || !mainVariantInput?.value) return;
+
+                selectField.value = mainVariantInput.value;
+                syncStickyVariantState();
+            };
+
+            const syncStickyQuantityFromMainForm = () => {
+                if (!stickyQuantityInput || !mainQuantityInput) return;
+
+                stickyQuantityInput.value = mainQuantityInput.value || 1;
+                stickyQuantityInput.min = mainQuantityInput.min || 1;
+
+                if (mainQuantityInput.hasAttribute('max')) {
+                    stickyQuantityInput.max = mainQuantityInput.max;
                 } else {
-                    stickyATC.classList.remove('show')
-                    document.documentElement.style.paddingBottom = '0'
+                    stickyQuantityInput.removeAttribute('max');
                 }
-            })
 
-            if (selectField) {
-                selectField.addEventListener('change', () => {
-                    img.setAttribute('src', selectField.options[selectField.selectedIndex].dataset.img)
-                })
-            }
+                stickyQuantityInput.step = mainQuantityInput.step || 1;
+            };
 
-            document.querySelector('.product-form [name="id"]')?.addEventListener('change', (e) => {
-                const value = Number(e.target.value)
+            const updateVisibility = () => {
+                const triggerElement = getTriggerElement();
 
-                if (value) {
-                    selectField.value = value
+                if (!triggerElement) return;
+
+                const triggerBottom = window.scrollY + triggerElement.getBoundingClientRect().bottom + offset;
+
+                if (window.scrollY > triggerBottom) {
+                    stickyATC.classList.add('show');
+                    document.documentElement.style.paddingBottom = `${stickyATC.clientHeight}px`;
+                    document.documentElement.style.height = 'auto';
+                } else {
+                    stickyATC.classList.remove('show');
+                    document.documentElement.style.paddingBottom = '0';
                 }
-            })
-            
-        })
+            };
+
+            selectField?.addEventListener('change', syncStickyVariantState);
+            mainVariantInput?.addEventListener('change', syncStickyVariantFromMainForm);
+            mainQuantityInput?.addEventListener('change', syncStickyQuantityFromMainForm);
+            mainQuantityInput?.addEventListener('input', syncStickyQuantityFromMainForm);
+
+            window.addEventListener('scroll', updateVisibility, { passive: true });
+            window.addEventListener('resize', updateVisibility);
+
+            syncStickyVariantFromMainForm();
+            syncStickyQuantityFromMainForm();
+            updateVisibility();
+        });
     </script>
 
     <div id="md-sticky-atc" class="color-{{ section.settings.color_scheme }}" aria-hidden="true" data-offset="{{ section.settings.offset }}">
@@ -218,6 +276,7 @@
                                         <option 
                                             value="{{ variant.id }}"
                                             data-img="{{ variant_image | img_url: img_size }}"
+                                            data-available="{{ variant.available }}"
                                             {% if current_variant.id == variant.id %}selected{% endif %}>
                                             {{ variant.title }} - {{ variant.price | money }}
                                         </option>
