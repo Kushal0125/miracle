@@ -1,6 +1,7 @@
 {{ 'template-collection.css' | asset_url | stylesheet_tag }}
 {{ 'component-card.css' | asset_url | stylesheet_tag }}
 {{ 'component-price.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'collection-hover-slider.js' | asset_url }}" defer="defer"></script>
 
 {% if section.settings.image_shape == 'blob' %}
   {{ 'mask-blobs.css' | asset_url | stylesheet_tag }}
@@ -194,17 +195,6 @@
     {{ 'mask-arch.svg' | inline_asset_content }}
   {%- endif -%}
 </div>
-<script>
-  document.addEventLIstener('DOMContentLoaded', function()=>{
-     document.addEventLIstener('.col-custom-prd').forEach(function (el)=>{
-       el.addEventLIstener('click', function ()=>{
-        const productData = JSON.parse(this.dataset.product);
-        console.log("Clicked Product Full Data:", productData);
-
-      })
-      })
-  })
-</script>
 
 {% schema %}
 {
