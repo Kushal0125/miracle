@@ -1,0 +1,60 @@
+{% comment %}
+  Renders basic store information from the Shopify shop object.
+
+  Accepts:
+  - heading: {String} Optional heading shown above the store details.
+  - class: {String} Optional class added to the wrapper.
+
+  Usage:
+  {% render 'store-info' %}
+  {% render 'store-info', heading: 'Store information', class: 'footer-store-info' %}
+{% endcomment %}
+
+{%- liquid
+  assign has_address = false
+  if shop.address.address1 != blank
+    assign has_address = true
+  endif
+-%}
+
+<div class="store-info{% if class != blank %} {{ class }}{% endif %}">
+  {%- if heading != blank -%}
+    <h3 class="store-info__heading inline-richtext">{{ heading }}</h3>
+  {%- endif -%}
+
+  <div class="store-info__content rte">
+    {%- if shop.name != blank -%}
+      <p><strong>{{ shop.name }}</strong></p>
+    {%- endif -%}
+
+    {%- if shop.email != blank -%}
+      <p>
+        <a href="mailto:{{ shop.email }}">{{ shop.email }}</a>
+      </p>
+    {%- endif -%}
+
+    {%- if shop.phone != blank -%}
+      <p>
+        <a href="tel:{{ shop.phone | replace: ' ', '' }}">{{ shop.phone }}</a>
+      </p>
+    {%- endif -%}
+
+    {%- if has_address -%}
+      <p>
+        {{ shop.address.address1 -}}
+        {%- if shop.address.address2 != blank -%}<br>{{ shop.address.address2 }}{%- endif -%}
+        {%- if shop.address.city != blank or shop.address.province != blank or shop.address.zip != blank -%}
+          <br>
+          {{- shop.address.city -}}
+          {%- if shop.address.province != blank and shop.address.city != blank -%}, {% endif -%}
+          {{- shop.address.province -}}
+          {%- if shop.address.zip != blank -%}
+            {%- if shop.address.city != blank or shop.address.province != blank -%} {% endif -%}
+            {{- shop.address.zip -}}
+          {%- endif -%}
+        {%- endif -%}
+        {%- if shop.address.country != blank -%}<br>{{ shop.address.country }}{%- endif -%}
+      </p>
+    {%- endif -%}
+  </div>
+</div>
