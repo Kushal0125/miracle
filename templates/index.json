@@ -109,6 +109,53 @@
         "padding_bottom": 36
       }
     },
+    "shop_the_look_home": {
+      "type": "shop-the-look",
+      "blocks": {
+        "look_item_1": {
+          "type": "look_item",
+          "settings": {
+            "label": "Layered jacket",
+            "x_position": 31,
+            "y_position": 28
+          }
+        },
+        "look_item_2": {
+          "type": "look_item",
+          "settings": {
+            "label": "Essential tee",
+            "x_position": 46,
+            "y_position": 44
+          }
+        },
+        "look_item_3": {
+          "type": "look_item",
+          "settings": {
+            "label": "Relaxed denim",
+            "x_position": 58,
+            "y_position": 72
+          }
+        }
+      },
+      "block_order": [
+        "look_item_1",
+        "look_item_2",
+        "look_item_3"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/shopify-new-update-banner.png",
+        "eyebrow": "Curated outfit",
+        "heading": "Shop the Look",
+        "heading_size": "h1",
+        "description": "<p>Build the full outfit from one styled moment. Pair statement pieces with everyday essentials and shop each item from the same look.</p>",
+        "products_title": "Complete the outfit",
+        "button_label": "Explore collection",
+        "button_link": "shopify://collections/all",
+        "color_scheme": "scheme-1",
+        "padding_top": 44,
+        "padding_bottom": 36
+      }
+    },
     "diwali_JUVpWz": {
       "type": "diwali",
       "disabled": true,
@@ -120,6 +167,7 @@
   },
   "order": [
     "image_banner",
+    "shop_the_look_home",
     "featured_collection",
     "image_with_text_home",
     "diwali_JUVpWz"

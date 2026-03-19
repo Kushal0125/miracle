@@ -1,0 +1,316 @@
+{{ 'component-card.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'section-shop-the-look.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<div class="color-{{ section.settings.color_scheme }} gradient">
+  <div class="shop-the-look section-{{ section.id }}-padding">
+    <div class="page-width">
+      <div class="shop-the-look__shell">
+        <div class="shop-the-look__intro">
+          {%- if section.settings.eyebrow != blank -%}
+            <p class="shop-the-look__eyebrow">{{ section.settings.eyebrow }}</p>
+          {%- endif -%}
+          {%- if section.settings.heading != blank -%}
+            <h2 class="shop-the-look__heading {{ section.settings.heading_size }}">{{ section.settings.heading }}</h2>
+          {%- endif -%}
+          {%- if section.settings.description != blank -%}
+            <div class="shop-the-look__description rte">{{ section.settings.description }}</div>
+          {%- endif -%}
+        </div>
+
+        <div class="shop-the-look__layout">
+          <div class="shop-the-look__image-panel">
+            <div class="shop-the-look__image-wrap">
+              <div
+                class="shop-the-look__image media media--transparent"
+                {% if section.settings.image != blank %}
+                  style="padding-bottom: {{ 1 | divided_by: section.settings.image.aspect_ratio | times: 100 }}%;"
+                {% else %}
+                  style="padding-bottom: 125%;"
+                {% endif %}
+              >
+                {%- if section.settings.image != blank -%}
+                  {{
+                    section.settings.image
+                    | image_url: width: 1800
+                    | image_tag:
+                      widths: '375, 550, 750, 1100, 1500, 1780',
+                      sizes: '(min-width: 990px) 60vw, 100vw',
+                      loading: 'lazy',
+                      alt: section.settings.heading | escape
+                  }}
+                {%- else -%}
+                  {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg placeholder' }}
+                {%- endif -%}
+
+                <div class="shop-the-look__overlay">
+                  {%- for block in section.blocks -%}
+                    {%- assign product = block.settings.product -%}
+                    <div
+                      class="shop-the-look__hotspot"
+                      style="left: {{ block.settings.x_position }}%; top: {{ block.settings.y_position }}%;"
+                      {{ block.shopify_attributes }}
+                    >
+                      <span class="shop-the-look__hotspot-dot"></span>
+                      <span class="shop-the-look__hotspot-label">
+                        {%- if block.settings.label != blank -%}
+                          {{ block.settings.label }}
+                        {%- elsif product != blank -%}
+                          {{ product.title }}
+                        {%- else -%}
+                          Look item
+                        {%- endif -%}
+                      </span>
+                    </div>
+                  {%- endfor -%}
+                </div>
+              </div>
+            </div>
+
+            {%- if section.blocks.size > 0 -%}
+              <div class="shop-the-look__hotspot-list">
+                {%- for block in section.blocks -%}
+                  {%- assign product = block.settings.product -%}
+                  <span class="shop-the-look__mobile-pill" {{ block.shopify_attributes }}>
+                    {%- if block.settings.label != blank -%}
+                      {{ block.settings.label }}
+                    {%- elsif product != blank -%}
+                      {{ product.title }}
+                    {%- else -%}
+                      Look item
+                    {%- endif -%}
+                  </span>
+                {%- endfor -%}
+              </div>
+            {%- endif -%}
+          </div>
+
+          <div class="shop-the-look__products">
+            <div class="shop-the-look__products-header">
+              <h3 class="shop-the-look__products-title">{{ section.settings.products_title }}</h3>
+              {%- if section.settings.button_label != blank -%}
+                <a
+                  {% if section.settings.button_link != blank %}
+                    href="{{ section.settings.button_link }}"
+                  {% else %}
+                    role="link" aria-disabled="true"
+                  {% endif %}
+                  class="shop-the-look__cta"
+                >
+                  {{ section.settings.button_label | escape }}
+                </a>
+              {%- endif -%}
+            </div>
+
+            <div class="shop-the-look__product-list" role="list">
+              {%- for block in section.blocks -%}
+                {%- assign product = block.settings.product -%}
+                <article class="shop-the-look__product-card" role="listitem" {{ block.shopify_attributes }}>
+                  <div class="shop-the-look__product-index">{{ forloop.index }}</div>
+                  <div class="shop-the-look__product-body">
+                    <div class="shop-the-look__product-media">
+                      {%- if product != blank and product.featured_image != blank -%}
+                        <a href="{{ product.url }}" class="shop-the-look__product-image-link">
+                          {{
+                            product.featured_image
+                            | image_url: width: 320
+                            | image_tag:
+                              widths: '120, 180, 240, 320',
+                              sizes: '96px',
+                              loading: 'lazy',
+                              alt: product.title | escape
+                          }}
+                        </a>
+                      {%- else -%}
+                        {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg placeholder' }}
+                      {%- endif -%}
+                    </div>
+                    <div class="shop-the-look__product-copy">
+                      {%- if block.settings.label != blank -%}
+                        <p class="shop-the-look__product-label">{{ block.settings.label }}</p>
+                      {%- endif -%}
+                      {%- if product != blank -%}
+                        <a href="{{ product.url }}" class="shop-the-look__product-title">{{ product.title }}</a>
+                        <div class="shop-the-look__product-price">
+                          {%- if product.compare_at_price > product.price -%}
+                            <span class="shop-the-look__price shop-the-look__price--sale">{{ product.price | money }}</span>
+                            <s class="shop-the-look__compare-price">{{ product.compare_at_price | money }}</s>
+                          {%- else -%}
+                            <span class="shop-the-look__price">{{ product.price | money }}</span>
+                          {%- endif -%}
+                        </div>
+                      {%- else -%}
+                        <p class="shop-the-look__product-title">Select a product</p>
+                        <div class="shop-the-look__product-price">
+                          <span class="shop-the-look__price">Product will appear here</span>
+                        </div>
+                      {%- endif -%}
+                    </div>
+                  </div>
+                </article>
+              {%- endfor -%}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Shop the look",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Look image"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Curated outfit"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Shop the Look"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "default": "h1",
+      "options": [
+        { "value": "h2", "label": "Small" },
+        { "value": "h1", "label": "Medium" },
+        { "value": "h0", "label": "Large" }
+      ]
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Build the full outfit from one styled moment. Pair statement pieces with everyday essentials and shop each item from the same look.</p>"
+    },
+    {
+      "type": "text",
+      "id": "products_title",
+      "label": "Products heading",
+      "default": "Complete the outfit"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Explore collection"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Section spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "look_item",
+      "name": "Look item",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Short label",
+          "default": "Style pick"
+        },
+        {
+          "type": "range",
+          "id": "x_position",
+          "min": 5,
+          "max": 95,
+          "step": 1,
+          "unit": "%",
+          "label": "Horizontal position",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "y_position",
+          "min": 5,
+          "max": 95,
+          "step": 1,
+          "unit": "%",
+          "label": "Vertical position",
+          "default": 50
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shop the look",
+      "blocks": [
+        { "type": "look_item" },
+        { "type": "look_item" },
+        { "type": "look_item" }
+      ]
+    }
+  ]
+}
+{% endschema %}
