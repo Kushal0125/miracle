@@ -25,6 +25,68 @@
         "show_text_below": false
       }
     },
+    "collapsible_content_home": {
+      "type": "collapsible-content",
+      "blocks": {
+        "collapsible_row_1": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Shipping information",
+            "icon": "truck",
+            "row_content": "<p>Orders are processed quickly and shipped with care so your delivery reaches you on time.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_2": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Returns and exchanges",
+            "icon": "return",
+            "row_content": "<p>If something is not the right fit, you can request a smooth return or exchange process.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_3": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Product quality",
+            "icon": "check_mark",
+            "row_content": "<p>Each product is selected for comfort, finish, and reliable everyday performance.</p>",
+            "page": ""
+          }
+        },
+        "collapsible_row_4": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Need help?",
+            "icon": "chat_bubble",
+            "row_content": "<p>Reach out to the support team anytime for product questions, sizing help, or order updates.</p>",
+            "page": ""
+          }
+        }
+      },
+      "block_order": [
+        "collapsible_row_1",
+        "collapsible_row_2",
+        "collapsible_row_3",
+        "collapsible_row_4"
+      ],
+      "settings": {
+        "caption": "Help desk",
+        "heading": "Frequently asked questions",
+        "heading_size": "h2",
+        "heading_alignment": "center",
+        "layout": "row",
+        "container_color_scheme": "scheme-2",
+        "color_scheme": "scheme-1",
+        "open_first_collapsible_row": true,
+        "image": "",
+        "image_ratio": "adapt",
+        "desktop_layout": "image_second",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
     "featured_collection": {
       "type": "featured-collection",
       "settings": {
@@ -64,6 +126,7 @@
   },
   "order": [
     "image_banner",
+    "collapsible_content_home",
     "featured_collection",
     "diwali_JUVpWz"
   ]
