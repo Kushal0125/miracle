@@ -25,6 +25,62 @@
         "show_text_below": false
       }
     },
+    "image_with_text_home": {
+      "type": "image-with-text",
+      "blocks": {
+        "caption_WbceQz": {
+          "type": "caption",
+          "settings": {
+            "caption": "New on the homepage",
+            "text_style": "caption-with-letter-spacing",
+            "text_size": "medium"
+          }
+        },
+        "heading_Rm1fQe": {
+          "type": "heading",
+          "settings": {
+            "heading": "A featured story with image and text",
+            "heading_size": "h1"
+          }
+        },
+        "text_tP9mLs": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Use this section to highlight a collection, promotion, brand message, or seasonal campaign with a strong visual and supporting copy.</p>",
+            "text_style": "body"
+          }
+        },
+        "button_Kx4nHv": {
+          "type": "button",
+          "settings": {
+            "button_label": "Explore more",
+            "button_link": "",
+            "button_style_secondary": false
+          }
+        }
+      },
+      "block_order": [
+        "caption_WbceQz",
+        "heading_Rm1fQe",
+        "text_tP9mLs",
+        "button_Kx4nHv"
+      ],
+      "settings": {
+        "image": "",
+        "height": "adapt",
+        "desktop_image_width": "medium",
+        "layout": "image_first",
+        "image_behavior": "none",
+        "content_layout": "no-overlap",
+        "desktop_content_position": "middle",
+        "desktop_content_alignment": "left",
+        "mobile_content_alignment": "left",
+        "section_color_scheme": "scheme-1",
+        "color_scheme": "scheme-1",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
     "featured_collection": {
       "type": "featured-collection",
       "settings": {
@@ -64,6 +120,7 @@
   },
   "order": [
     "image_banner",
+    "image_with_text_home",
     "featured_collection",
     "diwali_JUVpWz"
   ]
