@@ -1,0 +1,275 @@
+<script>
+  window.addEventListener('DOMContentLoaded', function () {
+    const FREEBIE_VARIANT_ID = 43036121071721;
+    const INTERNAL_REQUEST_HEADER = 'X-Freebie-Gift';
+    let syncInFlight = false;
+    let syncQueued = false;
+    let syncTimer = null;
+
+    function getSectionsToRender() {
+      return [
+        {
+          id: 'cart-drawer',
+          targetSelector: '#CartDrawer',
+          sourceSelector: '#CartDrawer',
+        },
+        {
+          id: 'cart-icon-bubble',
+          targetSelector: '#cart-icon-bubble',
+          sourceSelector: '.shopify-section',
+        },
+        {
+          id: 'main-cart-items',
+          targetSelector: '#main-cart-items .js-contents',
+          sourceSelector: '.js-contents',
+        },
+        {
+          id: 'main-cart-footer',
+          targetSelector: '#main-cart-footer .js-contents',
+          sourceSelector: '.js-contents',
+        },
+        {
+          id: 'cart-live-region-text',
+          targetSelector: '#cart-live-region-text',
+          sourceSelector: '.shopify-section',
+        },
+      ].filter(function (section) {
+        return document.querySelector(section.targetSelector);
+      });
+    }
+
+    function getSectionIds() {
+      return getSectionsToRender().map(function (section) {
+        return section.id;
+      });
+    }
+
+    function getManagedHeaders(extraHeaders) {
+      const headers = new Headers(extraHeaders || {});
+      headers.set('Content-Type', 'application/json');
+      headers.set('Accept', 'application/json');
+      headers.set(INTERNAL_REQUEST_HEADER, '1');
+      return headers;
+    }
+
+    function isCartMutationUrl(url) {
+      if (!url) return false;
+
+      try {
+        const parsedUrl = new URL(url, window.location.origin);
+        return /\/cart\/(add|change|update|clear)(\.js)?$/i.test(parsedUrl.pathname);
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function hasInternalRequestHeader(input, init) {
+      const requestHeaders = new Headers(
+        (init && init.headers) || (input instanceof Request ? input.headers : undefined) || {}
+      );
+
+      return requestHeaders.get(INTERNAL_REQUEST_HEADER) === '1';
+    }
+
+    function scheduleSync(delay) {
+      clearTimeout(syncTimer);
+      syncTimer = setTimeout(runSync, typeof delay === 'number' ? delay : 150);
+    }
+
+    async function getCart() {
+      const response = await fetch(window.routes.cart_url + '.js', {
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Unable to load cart state.');
+      }
+
+      return response.json();
+    }
+
+    async function mutateCart(url, body) {
+      const sectionIds = getSectionIds();
+      const payload = Object.assign({}, body);
+
+      if (sectionIds.length) {
+        payload.sections = sectionIds;
+        payload.sections_url = window.location.pathname + window.location.search;
+      }
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: getManagedHeaders(),
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error('Unable to update the cart.');
+      }
+
+      return response.json();
+    }
+
+    function applySections(sections) {
+      if (!sections) return;
+
+      getSectionsToRender().forEach(function (section) {
+        const html = sections[section.id];
+        const target = document.querySelector(section.targetSelector);
+
+        if (!html || !target) return;
+
+        const sourceDocument = new DOMParser().parseFromString(html, 'text/html');
+        const source = sourceDocument.querySelector(section.sourceSelector);
+
+        if (source) {
+          target.innerHTML = source.innerHTML;
+        }
+      });
+    }
+
+    function updateEmptyStates(cart) {
+      const isEmpty = cart.item_count === 0;
+      const cartItems = document.querySelector('cart-items');
+      const cartDrawer = document.querySelector('cart-drawer');
+      const cartFooter = document.getElementById('main-cart-footer');
+
+      if (cartItems) cartItems.classList.toggle('is-empty', isEmpty);
+      if (cartDrawer) cartDrawer.classList.toggle('is-empty', isEmpty);
+      if (cartFooter) cartFooter.classList.toggle('is-empty', isEmpty);
+    }
+
+    function publishCartUpdate(cart) {
+      if (typeof publish === 'function' && typeof PUB_SUB_EVENTS !== 'undefined' && PUB_SUB_EVENTS.cartUpdate) {
+        publish(PUB_SUB_EVENTS.cartUpdate, {
+          source: 'freebie-gift',
+          cartData: cart,
+        });
+      }
+    }
+
+    async function refreshCartUi(mutationResponse) {
+      const latestCart = await getCart();
+
+      applySections(mutationResponse && mutationResponse.sections);
+      updateEmptyStates(latestCart);
+      publishCartUpdate(latestCart);
+    }
+
+    async function addFreebie() {
+      const mutationResponse = await mutateCart(window.routes.cart_add_url + '.js', {
+        items: [
+          {
+            id: FREEBIE_VARIANT_ID,
+            quantity: 1,
+            properties: {
+              _freebie_gift: 'true',
+            },
+          },
+        ],
+      });
+
+      await refreshCartUi(mutationResponse);
+    }
+
+    async function setFreebieQuantity(quantity) {
+      const mutationResponse = await mutateCart(window.routes.cart_update_url + '.js', {
+        updates: {
+          [FREEBIE_VARIANT_ID]: quantity,
+        },
+      });
+
+      await refreshCartUi(mutationResponse);
+    }
+
+    async function runSync() {
+      if (syncInFlight) {
+        syncQueued = true;
+        return;
+      }
+
+      syncInFlight = true;
+
+      try {
+        const cart = await getCart();
+        const freebieItems = cart.items.filter(function (item) {
+          return Number(item.variant_id) === FREEBIE_VARIANT_ID;
+        });
+        const paidItems = cart.items.filter(function (item) {
+          return Number(item.variant_id) !== FREEBIE_VARIANT_ID;
+        });
+        const freebieQuantity = freebieItems.reduce(function (total, item) {
+          return total + item.quantity;
+        }, 0);
+
+        if (paidItems.length === 0 && freebieQuantity > 0) {
+          await setFreebieQuantity(0);
+          return;
+        }
+
+        if (paidItems.length > 0 && freebieQuantity === 0) {
+          await addFreebie();
+          return;
+        }
+
+        if (paidItems.length > 0 && freebieQuantity > 1) {
+          await setFreebieQuantity(1);
+        }
+      } catch (error) {
+        console.error('Freebie gift sync failed:', error);
+      } finally {
+        syncInFlight = false;
+
+        if (syncQueued) {
+          syncQueued = false;
+          scheduleSync(0);
+        }
+      }
+    }
+
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = function (input, init) {
+      const watchRequest = isCartMutationUrl(typeof input === 'string' ? input : input.url) &&
+        !hasInternalRequestHeader(input, init);
+
+      return originalFetch(input, init).then(function (response) {
+        if (watchRequest && response.ok) {
+          scheduleSync();
+        }
+
+        return response;
+      });
+    };
+
+    const originalOpen = XMLHttpRequest.prototype.open;
+    const originalSend = XMLHttpRequest.prototype.send;
+
+    XMLHttpRequest.prototype.open = function (method, url) {
+      this.__freebieGiftWatch = isCartMutationUrl(url);
+      return originalOpen.apply(this, arguments);
+    };
+
+    XMLHttpRequest.prototype.send = function () {
+      if (this.__freebieGiftWatch) {
+        this.addEventListener('loadend', function () {
+          if (this.status >= 200 && this.status < 300) {
+            scheduleSync();
+          }
+        });
+      }
+
+      return originalSend.apply(this, arguments);
+    };
+
+    if (typeof subscribe === 'function' && typeof PUB_SUB_EVENTS !== 'undefined' && PUB_SUB_EVENTS.cartUpdate) {
+      subscribe(PUB_SUB_EVENTS.cartUpdate, function (event) {
+        if (event && event.source === 'freebie-gift') return;
+        scheduleSync(0);
+      });
+    }
+
+    scheduleSync(0);
+  });
+</script>
